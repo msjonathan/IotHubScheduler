@@ -22,35 +22,20 @@ namespace DeviceSimulator
         static async Task Main(string[] args)
         {
             var options = new Options();
-            await Parser.Default.ParseArguments<Options>(args)
-                .MapResult(
-                (Options opts) => Process(opts), err => Task.FromResult(0));
-        }
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(opts =>
+                {
+                    options = opts;
+                })
+                .WithNotParsed((errs) => throw new ArgumentException(string.Join(Environment.NewLine, errs)));
 
-        private static async Task<int> Process(Options options)
-        {
             var client = DeviceClient.CreateFromConnectionString(options.connectionstring, options.DeviceId);
 
             await client.SetMethodHandlerAsync("HandleDirectMethod", HandleDirectMethod, null);
-            await Task.Run(() => { WaitForKeyPress(); });
-            return await Task.FromResult(1);
-        }
 
-        public static void WaitForKeyPress()
-        {
-            Console.WriteLine("Press Enter to exit.");
-
-            ConsoleKeyInfo cki = new ConsoleKeyInfo();
-            do
-            {
-                // true hides the pressed character from the console
-                cki = Console.ReadKey(true);
-
-                // Wait for an enter
-            } while (cki.Key != ConsoleKey.Enter);
+            await Task.Delay(TimeSpan.FromMinutes(2));
 
         }
-
         private static Task<MethodResponse> HandleDirectMethod(MethodRequest methodRequest, object userContext)
         {
             var data = Encoding.UTF8.GetString(methodRequest.Data);

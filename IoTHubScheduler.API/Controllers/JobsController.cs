@@ -44,13 +44,13 @@ namespace IoTHubScheduler.API.Controllers
             return persistedJobs;
            
         }
-        [HttpGet("{controller}/jobs/{id}")]
+        [HttpGet("jobs/{id}")]
         public async Task<Job> GetJob(string id)
         {
             var persistedJob = await _jobStorage.FetchJob(id);
 
             await _jobClient.OpenAsync();
-            var job = await _jobClient.GetJobAsync(persistedJob.Id);
+            var job = await _jobClient.GetJobAsync(id);
             await _jobClient.CloseAsync();
 
             return persistedJob;
@@ -59,12 +59,25 @@ namespace IoTHubScheduler.API.Controllers
         [HttpPost]
         public async Task<string> CreateJob(CreateJobRequest createJobRequest)
         {
+            var jobId = Guid.NewGuid().ToString();
+
             await _jobClient.OpenAsync();
 
-            CloudToDeviceMethod directMethod = new CloudToDeviceMethod("", TimeSpan.FromSeconds(5),
-      TimeSpan.FromSeconds(5));
+            if(createJobRequest.Type == Models.JobType.DirectMethod)
+            {
+                CloudToDeviceMethod directMethod = new CloudToDeviceMethod("HandleDirectMethod", TimeSpan.FromSeconds(5),
+                    TimeSpan.FromSeconds(5));
 
-            throw new NotImplementedException();
+                directMethod.SetPayloadJson(createJobRequest.Data);
+
+                await _jobClient.ScheduleDeviceMethodAsync(jobId, createJobRequest.Query, directMethod, DateTime.UtcNow, 5);
+            }
+
+            await _jobClient.CloseAsync();
+
+           // var job = await _jobClient.GetJobAsync(jobId);
+
+            return await Task.FromResult(jobId);
         }
     }
 }
