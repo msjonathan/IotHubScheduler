@@ -1,0 +1,47 @@
+﻿@page "/alljobs"
+
+@using IoTJobClient.Data
+@using IoTJobClient.Models
+@inject IotJobService JobService
+
+<h1>IoT Jobs</h1>
+
+<p>This page displays all current jobs configured and their status</p>
+
+@if (jobs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Query</th>
+                <th>Type</th>
+                <th>CreationDate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var job in jobs)
+            {
+                <tr>
+                    <td>@job.Id</td>
+                    <td>@job.Query</td>
+                    <td>@job.Type</td>
+                    <td>@job.CreationTime</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Job> jobs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        jobs = await JobService.GetJobs();
+    }
+}
