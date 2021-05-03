@@ -23,7 +23,7 @@ content-type: application/json
 
 {
     "Query": "DeviceId IN ['FP45a4506d84ed457e87e8557887c23094']",
-    "Data":"{ Tags:{\r\n\"test\": \"testvalue\"\r\n} }",
+    "Data":"{ Tags:{\r\n\"test\": \"testvalue\"\r\n}, DesiredProperties:{\r\n\"testprop\": \"testvalue\" } }",
     "Type": "UpdateDeviceTwin"
 }
 
