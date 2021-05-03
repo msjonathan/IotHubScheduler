@@ -8,5 +8,8 @@ namespace IoTHubScheduler.API.Services
     {
         Task<List<Job>> FetchAllJobs();
         Task<Job> FetchJob(string id);
+        Task StoreJob(Job job);
+        Task DeleteJob(string id);
+
     }
 }

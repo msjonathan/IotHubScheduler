@@ -1,0 +1,32 @@
+GET https://localhost:44324/jobs/
+
+### 
+
+GET https://localhost:44324/jobs/12345556/
+
+
+####
+
+POST https://localhost:44324/jobs
+content-type: application/json
+
+{
+    "Query": "DeviceId IN ['FP45a4506d84ed457e87e8557887c23094']",
+    "Data":" {\r\n        \"key1\": \"value2\"\r\n    }",
+    "Type": "DirectMethod"
+}
+
+### 
+
+POST https://localhost:44324/jobs
+content-type: application/json
+
+{
+    "Query": "DeviceId IN ['FP45a4506d84ed457e87e8557887c23094']",
+    "Data":"{ Tags:{\r\n\"test\": \"testvalue\"\r\n} }",
+    "Type": "UpdateDeviceTwin"
+}
+
+### 
+
+DELETE  https://localhost:44324/jobs/d3d90082-ed0e-4206-8016-f0040567b8a3
