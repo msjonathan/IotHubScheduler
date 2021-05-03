@@ -2,6 +2,14 @@ GET https://localhost:44324/jobs/
 
 ### 
 
+GET https://localhost:44324/jobs?status=Cancelled
+
+### 
+
+GET https://localhost:44324/jobs?status=Running
+
+### 
+
 GET https://localhost:44324/jobs/12345556/
 
 
@@ -11,7 +19,7 @@ POST https://localhost:44324/jobs
 content-type: application/json
 
 {
-    "Query": "DeviceId IN ['FP45a4506d84ed457e87e8557887c23094']",
+    "Query": "DeviceId IN ['FPde3bee3fadb7440abca0513cc51221dd']",
     "Data":" {\r\n        \"key1\": \"value2\"\r\n    }",
     "Type": "DirectMethod"
 }
@@ -22,8 +30,8 @@ POST https://localhost:44324/jobs
 content-type: application/json
 
 {
-    "Query": "DeviceId IN ['FP45a4506d84ed457e87e8557887c23094']",
-    "Data":"{ Tags:{\r\n\"test\": \"testvalue\"\r\n}, DesiredProperties:{\r\n\"testprop\": \"testvalue\" } }",
+    "Query": "DeviceId IN ['FPde3bee3fadb7440abca0513cc51221dd']",
+    "Data":"{ Tags:{\r\n\"FieldTest\": \"true\"\r\n}, DesiredProperties:{\r\n\"FeatureFlagDI\": \"true\" } }",
     "Type": "UpdateDeviceTwin"
 }
 

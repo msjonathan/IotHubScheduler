@@ -29,7 +29,7 @@ namespace IoTHubScheduler.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<JobResponse>> GetJobs()
+        public async Task<IEnumerable<JobResponse>> GetJobs(string status)
         {
             var retVal = new List<JobResponse>();
             // with the CreateQuery we can consult the 
@@ -48,6 +48,10 @@ namespace IoTHubScheduler.API.Controllers
 
             await _jobClient.CloseAsync();
 
+            if(!string.IsNullOrEmpty(status))
+            {
+                return retVal.Where(f => f.Status.ToString() == status);
+            }
             return retVal;
 
         }

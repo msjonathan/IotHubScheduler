@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json;
 using System;
 using System.Text;
@@ -30,12 +31,19 @@ namespace DeviceSimulator
                 .WithNotParsed((errs) => throw new ArgumentException(string.Join(Environment.NewLine, errs)));
 
             var client = DeviceClient.CreateFromConnectionString(options.connectionstring, options.DeviceId);
-
+            await client.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertyChangedAsync, null);
             await client.SetMethodHandlerAsync("HandleDirectMethod", HandleDirectMethod, null);
 
-            await Task.Delay(TimeSpan.FromMinutes(2));
+            await Task.Delay(TimeSpan.FromMinutes(10));
 
         }
+        private static async Task OnDesiredPropertyChangedAsync(TwinCollection desiredProperties, object userContext)
+        {
+            Console.WriteLine("\tDesired property changed:");
+            Console.WriteLine($"\t{desiredProperties.ToJson()}");
+            await Task.CompletedTask;
+        }
+
         private static Task<MethodResponse> HandleDirectMethod(MethodRequest methodRequest, object userContext)
         {
             var data = Encoding.UTF8.GetString(methodRequest.Data);
