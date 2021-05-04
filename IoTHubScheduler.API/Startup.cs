@@ -32,7 +32,9 @@ namespace IoTHubScheduler.API
                 {
                     opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
+            // added both services as singleton to only have 1 connection
             services.AddSingleton<IJobStorage, JobStorage>();
+            services.AddSingleton<IJobService, JobService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

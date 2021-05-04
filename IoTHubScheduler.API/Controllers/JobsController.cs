@@ -20,110 +20,38 @@ namespace IoTHubScheduler.API.Controllers
         private readonly ILogger<JobsController> _logger;
         private JobClient _jobClient;
         private IJobStorage _jobStorage;
+        private IJobService _jobService;
 
-        public JobsController(ILogger<JobsController> logger, IConfiguration configuration, IJobStorage jobStorage)
+        public JobsController(ILogger<JobsController> logger, IConfiguration configuration, IJobStorage jobStorage, IJobService jobService)
         {
             _logger = logger;
             _jobClient = JobClient.CreateFromConnectionString(configuration.GetConnectionString("iothub"));
             _jobStorage = jobStorage;
+            _jobService = jobService;
         }
 
         [HttpGet]
         public async Task<IEnumerable<JobResponse>> GetJobs(string status)
         {
-            var retVal = new List<JobResponse>();
-            // with the CreateQuery we can consult the 
-            // open questions how long are the jobs available as history?
-            var jobs = _jobClient.CreateQuery();
-
-            while(jobs.HasMoreResults)
+            if (string.IsNullOrEmpty(status))
             {
-               var jobResponses = await jobs.GetNextAsJobResponseAsync();
-
-                foreach (var jobResponse in jobResponses)
-                {
-                    retVal.Add(jobResponse);
-                }
+                return await _jobService.GetAllJobs();
             }
 
-            await _jobClient.CloseAsync();
-
-            if(!string.IsNullOrEmpty(status))
-            {
-                return retVal.Where(f => f.Status.ToString() == status);
-            }
-            return retVal;
-
+            return await _jobService.GetAllJobsByStatus(Enum.Parse<JobStatus>(status));
         }
 
         [HttpGet("{id}")]
         public async Task<JobResponse> GetJob(string id)
         {
-            await _jobClient.OpenAsync();
-            var job = await _jobClient.GetJobAsync(id);
-            await _jobClient.CloseAsync();
-
-            return job;
+            return await _jobService.GetJob(id);
         }
 
 
         [HttpPost]
         public async Task<string> CreateJob(CreateJobRequest createJobRequest)
         {
-            try
-            {
-                var jobId = Guid.NewGuid().ToString();
-
-                await _jobClient.OpenAsync();
-
-                if (createJobRequest.Type == Models.JobType.DirectMethod)
-                {
-                    CloudToDeviceMethod directMethod = new CloudToDeviceMethod("HandleDirectMethod", TimeSpan.FromSeconds(5),
-                        TimeSpan.FromSeconds(5));
-
-                    directMethod.SetPayloadJson(createJobRequest.Data);
-
-                    await _jobClient.ScheduleDeviceMethodAsync(jobId, createJobRequest.Query, directMethod, DateTime.UtcNow, 5);
-                }
-                if(createJobRequest.Type == Models.JobType.UpdateDeviceTwin)
-                {
-                    var twin = new Twin();
-
-                    var twinChanges = JObject.Parse(createJobRequest.Data);
-
-                    foreach (JProperty tag in (JToken)twinChanges["Tags"])
-                    {
-                        twin.Tags[tag.Name] = (string)tag.Value;
-                    }
-                    foreach (JProperty property in (JToken)twinChanges["DesiredProperties"])
-                    {
-                        // this does not yet support a complex json structure
-                        twin.Properties.Desired[property.Name] = (string)property.Value;
-                    }
-                    
-                    await _jobClient.ScheduleTwinUpdateAsync(jobId, createJobRequest.Query, twin, DateTime.UtcNow, 5);                
-                }
-
-                await _jobClient.CloseAsync();
-
-                // not really neccecary but just for poc purposes we also store it in a redis store
-                await _jobStorage.StoreJob(new Job()
-                {
-                    Type = createJobRequest.Type.ToString(),
-                    CreationTime = DateTime.UtcNow,
-                    Id = jobId,
-                    Data = createJobRequest.Query
-                });
-
-                return await Task.FromResult(jobId);
-            }
-            catch (Exception)
-            {
-                // this is a poc, we are not interested in the scenario's where it goes wrong
-                throw;
-            }
-
-
+           return await _jobService.CreateJob(createJobRequest);
         }
     }
 }
