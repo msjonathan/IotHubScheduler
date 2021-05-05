@@ -54,7 +54,7 @@ jobs:
         registry-username: ${{ secrets.REGISTRY_USERNAME }}
         registry-password: ${{ secrets.REGISTRY_PASSWORD }}
         name: iothub-scheduler
-        secure-environment-variables: Redis=${{ secrets.CONNECTIONSTRINGS_REDIS }} CONNECTIONSTRINGS_IOTHUB=${{ secrets.CONNECTIONSTRINGS_IOTHUB }}
+        secure-environment-variables: Redis=${{ secrets.CONNECTIONSTRINGS_REDIS }} CUSTOMCONNSTR_iothub=${{ secrets.CONNECTIONSTRINGS_IOTHUB }}
         location: 'west europe'
         
       #todo variables still need to be set
