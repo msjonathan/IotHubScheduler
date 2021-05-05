@@ -7,7 +7,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
 WORKDIR /src
-COPY ["IoTHubScheduler.API/IoTHubScheduler.API.csproj", "IoTHubScheduler.API/"]
+COPY ["IoTHubScheduler.API.csproj", "IoTHubScheduler.API/"]
 RUN dotnet restore "IoTHubScheduler.API/IoTHubScheduler.API.csproj"
 COPY . .
 WORKDIR "/src/IoTHubScheduler.API"
