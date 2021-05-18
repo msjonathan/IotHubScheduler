@@ -31,22 +31,10 @@ namespace IoTHubScheduler.API.Services
         {
             // first lookup if there is any running job 
             var runningJobs = await GetAllJobsByStatus(JobStatus.Running);
-           
-            if(runningJobs != null)
-            {
-                // if there is we should schedule the job after that one (S1 has the limitation of 1 concurrent job)
-                // for now we'll assume there is only 1 running
-                var runningJob = runningJobs.First();
 
-                // added extra 10 seconds 
-                var startTime = runningJob.StartTimeUtc.Value.AddSeconds(runningJob.MaxExecutionTimeInSeconds).AddSeconds(10);
-            }
-            else
-            {
-                var startTime = DateTime.UtcNow;
-            }
-         
-              
+
+            var startTime = runningJobs.Count() > 0 ? runningJobs.First().StartTimeUtc.Value.AddSeconds(runningJobs.First().MaxExecutionTimeInSeconds).AddSeconds(10) : DateTime.UtcNow;
+
             var jobId = Guid.NewGuid().ToString();
 
             if (createJobRequest.Type == Models.JobType.DirectMethod)
@@ -90,7 +78,7 @@ namespace IoTHubScheduler.API.Services
 
         public void Dispose()
         {
-           if(_jobClient != null)
+            if (_jobClient != null)
             {
                 _jobClient.CloseAsync();
             }
@@ -117,7 +105,7 @@ namespace IoTHubScheduler.API.Services
 
         public async Task<List<JobResponse>> GetAllJobsByStatus(JobStatus status)
         {
-           return (await GetAllJobs()).Where(f => f.Status == status).ToList();
+            return (await GetAllJobs()).Where(f => f.Status == status).ToList();
         }
 
         public async Task<JobResponse> GetJob(string id)
