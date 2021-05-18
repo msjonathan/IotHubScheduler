@@ -32,12 +32,20 @@ namespace IoTHubScheduler.API.Services
             // first lookup if there is any running job 
             var runningJobs = await GetAllJobsByStatus(JobStatus.Running);
            
-            // if there is we should schedule the job after that one (S1 has the limitation of 1 concurrent job)
-            // for now we'll assume there is only 1 running
-            var runningJob = runningJobs.First();
+            if(runningJobs != null)
+            {
+                // if there is we should schedule the job after that one (S1 has the limitation of 1 concurrent job)
+                // for now we'll assume there is only 1 running
+                var runningJob = runningJobs.First();
 
-            // added extra 10 seconds 
-            var startTime = runningJob.StartTimeUtc.Value.AddSeconds(runningJob.MaxExecutionTimeInSeconds).AddSeconds(10);
+                // added extra 10 seconds 
+                var startTime = runningJob.StartTimeUtc.Value.AddSeconds(runningJob.MaxExecutionTimeInSeconds).AddSeconds(10);
+            }
+            else
+            {
+                var startTime = DateTime.UtcNow;
+            }
+         
               
             var jobId = Guid.NewGuid().ToString();
 

@@ -1,5 +1,4 @@
-GET https://localhost:44324/jobs/
-
+GET http://20.82.12.160/jobs/
 
 ### 
 
