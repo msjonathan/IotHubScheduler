@@ -1,16 +1,20 @@
-GET http://20.82.12.160/jobs/
+GET http://20.76.200.232/jobs/
 
 ### 
 
-GET https://localhost:44324/jobs?status=Cancelled
+GET http://20.76.200.232/jobs?status=Completed
 
 ### 
 
-GET https://localhost:44324/jobs?status=Running
+GET http://20.76.200.232/jobs?status=Cancelled
 
 ### 
 
-GET https://localhost:44324/jobs/12345556/
+GET http://20.76.200.232/jobs?status=Running
+
+### 
+
+GET http://20.76.200.232/jobs/44356951-b759-4bf7-92fd-ea399f087886/
 
 
 ####
@@ -26,12 +30,12 @@ content-type: application/json
 
 ### 
 
-POST https://localhost:44324/jobs
+POST http://localhost:49154/jobs
 content-type: application/json
 
 {
-    "Query": "DeviceId IN ['FPde3bee3fadb7440abca0513cc51221dd']",
-    "Data":"{ Tags:{\r\n\"FieldTest\": \"true\"\r\n}, DesiredProperties:{\r\n\"FeatureFlagDI\": \"true\" } }",
+    "Query": "tags.gatewayspecs.groups=['DIFieldTest']",
+    "Data":"{ \"DesiredProperties\":{ \r\n    \"firmwareVersion\": \"2.11.2\" \r\n    } \r\n}",
     "Type": "UpdateDeviceTwin"
 }
 
