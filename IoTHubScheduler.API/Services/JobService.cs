@@ -52,14 +52,21 @@ namespace IoTHubScheduler.API.Services
 
                 var twinChanges = JObject.Parse(createJobRequest.Data);
 
-                foreach (JProperty tag in (JToken)twinChanges["Tags"])
+                if (twinChanges["Tags"] != null)
                 {
-                    twin.Tags[tag.Name] = (string)tag.Value;
+                    foreach (JProperty tag in (JToken)twinChanges["Tags"])
+                    {
+                        twin.Tags[tag.Name] = (string)tag.Value;
+                    }
                 }
-                foreach (JProperty property in (JToken)twinChanges["DesiredProperties"])
+
+                if (twinChanges["DesiredProperties"] != null)
                 {
-                    // this does not yet support a complex json structure
-                    twin.Properties.Desired[property.Name] = (string)property.Value;
+                    foreach (JProperty property in (JToken)twinChanges["DesiredProperties"])
+                    {
+                        // this does not yet support a complex json structure
+                        twin.Properties.Desired[property.Name] = (string)property.Value;
+                    }
                 }
 
                 await _jobClient.ScheduleTwinUpdateAsync(jobId, createJobRequest.Query, twin, startTime, maxExecutionTimeInSeconds: 15);
